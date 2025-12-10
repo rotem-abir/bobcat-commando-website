@@ -1,6 +1,38 @@
+// =============================================
+// AUDIO PLAYER TEMPLATE
+// Edit this once to update all players
+// =============================================
+const PLAYER_HTML = `
+<div class="audio-player">
+    <div class="time-slider-container">
+        <input type="range" class="time-slider" value="0" min="0" max="100">
+        <div class="time-display">
+            <span class="current-time">0:00</span>
+            <span class="duration">0:00</span>
+        </div>
+    </div>
+    <div class="player-bottom-controls">
+        <button class="player-btn play-pause-btn">
+            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <div class="volume-container">
+            <button class="volume-btn">
+                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </button>
+            <input type="range" class="volume-slider" value="100" min="0" max="100">
+        </div>
+    </div>
+</div>
+`;
+
+// =============================================
+// AUDIO PLAYER LOGIC
+// =============================================
 const audio = new Audio();
 let currentBtn = null;
 let currentPlayer = null;
+let currentContainer = null;
 let savedVolume = 1;
 
 // Format time helper
@@ -19,61 +51,21 @@ function updateIcons(element, isPlaying) {
     if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
 }
 
-// Track button clicks
-document.querySelectorAll('.track-btn').forEach(btn => {
-    const trackItem = btn.closest('.track-item');
-    const player = trackItem.querySelector('.audio-player');
+// Inject player into container and setup controls
+function injectPlayer(container) {
+    container.innerHTML = PLAYER_HTML;
+    const player = container.querySelector('.audio-player');
+    
     const playPauseBtn = player.querySelector('.play-pause-btn');
     const timeSlider = player.querySelector('.time-slider');
-    const currentTimeEl = player.querySelector('.current-time');
-    const durationEl = player.querySelector('.duration');
     const volumeSlider = player.querySelector('.volume-slider');
     const volumeBtn = player.querySelector('.volume-btn');
 
-    btn.addEventListener('click', function() {
-        const trackSrc = this.dataset.track;
-        
-        // If clicking same button, stop and close player
-        if (currentBtn === this) {
-            audio.pause();
-            audio.currentTime = 0;
-            updateIcons(this, false);
-            updateIcons(playPauseBtn, false);
-            this.classList.remove('playing');
-            player.classList.remove('visible');
-            // Reset time display
-            const currentTimeEl = player.querySelector('.current-time');
-            const timeSliderEl = player.querySelector('.time-slider');
-            if (currentTimeEl) currentTimeEl.textContent = '0:00';
-            if (timeSliderEl) timeSliderEl.value = 0;
-            currentBtn = null;
-            currentPlayer = null;
-            return;
-        }
-        
-        // Hide previous player and reset button
-        if (currentBtn && currentBtn !== this) {
-            const prevItem = currentBtn.closest('.track-item');
-            const prevPlayer = prevItem.querySelector('.audio-player');
-            prevPlayer.classList.remove('visible');
-            updateIcons(currentBtn, false);
-            currentBtn.classList.remove('playing');
-        }
-        
-        // Show this player and play
-        player.classList.add('visible');
-        audio.src = trackSrc;
-        audio.play();
-        updateIcons(this, true);
-        updateIcons(playPauseBtn, true);
-        this.classList.add('playing');
-        currentBtn = this;
-        currentPlayer = player;
-    });
+    // Set current volume
+    volumeSlider.value = audio.volume * 100;
 
     // Player play/pause button
     playPauseBtn.addEventListener('click', function() {
-        if (!currentBtn || currentBtn.closest('.track-item') !== trackItem) return;
         if (audio.paused) {
             audio.play();
             updateIcons(currentBtn, true);
@@ -89,7 +81,6 @@ document.querySelectorAll('.track-btn').forEach(btn => {
 
     // Time slider
     timeSlider.addEventListener('input', function() {
-        if (currentPlayer !== player) return;
         const time = (this.value / 100) * audio.duration;
         audio.currentTime = time;
     });
@@ -97,8 +88,6 @@ document.querySelectorAll('.track-btn').forEach(btn => {
     // Volume slider
     volumeSlider.addEventListener('input', function() {
         audio.volume = this.value / 100;
-        // Sync all volume sliders
-        document.querySelectorAll('.volume-slider').forEach(vs => vs.value = this.value);
     });
 
     // Volume button (mute toggle)
@@ -106,11 +95,59 @@ document.querySelectorAll('.track-btn').forEach(btn => {
         if (audio.volume > 0) {
             savedVolume = audio.volume;
             audio.volume = 0;
-            document.querySelectorAll('.volume-slider').forEach(vs => vs.value = 0);
+            volumeSlider.value = 0;
         } else {
             audio.volume = savedVolume;
-            document.querySelectorAll('.volume-slider').forEach(vs => vs.value = savedVolume * 100);
+            volumeSlider.value = savedVolume * 100;
         }
+    });
+
+    return player;
+}
+
+// Track button clicks
+document.querySelectorAll('.track-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const trackItem = this.closest('.track-item');
+        const container = trackItem.querySelector('.audio-player-container');
+        const trackSrc = this.dataset.track;
+        
+        // If clicking same button, stop and close player
+        if (currentBtn === this) {
+            audio.pause();
+            audio.currentTime = 0;
+            updateIcons(this, false);
+            this.classList.remove('playing');
+            container.innerHTML = ''; // Remove player
+            currentBtn = null;
+            currentPlayer = null;
+            currentContainer = null;
+            return;
+        }
+        
+        // Hide previous player
+        if (currentBtn) {
+            updateIcons(currentBtn, false);
+            currentBtn.classList.remove('playing');
+            if (currentContainer) {
+                currentContainer.innerHTML = ''; // Remove previous player
+            }
+        }
+        
+        // Inject and show new player
+        const player = injectPlayer(container);
+        player.classList.add('visible');
+        
+        // Play audio
+        audio.src = trackSrc;
+        audio.play();
+        updateIcons(this, true);
+        updateIcons(player.querySelector('.play-pause-btn'), true);
+        this.classList.add('playing');
+        
+        currentBtn = this;
+        currentPlayer = player;
+        currentContainer = container;
     });
 });
 
@@ -151,4 +188,3 @@ document.getElementById('coverImage').addEventListener('click', function() {
         block: 'start'
     });
 });
-
