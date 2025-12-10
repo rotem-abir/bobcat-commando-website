@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobcat Commando</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --accent-gold: #c9a227;
+            --accent-cream: #f5f0e1;
+            --text-muted: #6b6b6b;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            background: #ffffff;
+            color: var(--bg-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Atmospheric background */
+        .bg-atmosphere {
+            display: none;
+        }
+
+        /* Grain texture overlay */
+        .grain {
+            display: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .label-tag {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: inline-block;
+            border: 1px solid var(--accent-gold);
+            padding: 0.5rem 1.5rem;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            letter-spacing: 0.15em;
+            line-height: 0.9;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo_img {
+            display: block;
+            width: 120px;
+            max-width: 100%;
+            height: auto;
+            margin: 1rem auto;
+        }
+
+        /* Vinyl showcase */
+        .vinyl-showcase {
+            position: relative;
+            margin: 2rem 0 4rem;
+            animation: fadeInUp 1.2s ease-out 0.3s both;
+        }
+
+        .vinyl-image {
+            max-width: 100%;
+            width: 700px;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 
+                0 15px 35px rgba(50, 26, 144, 0.15),
+                0 5px 15px rgba(50, 26, 144, 0.1);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .vinyl-image:hover {
+            transform: scale(1.05) translateY(-10px);
+            cursor: pointer;
+        }
+
+        /* Release info */
+        .release-info {
+            text-align: center;
+            max-width: 500px;
+            animation: fadeInUp 1.2s ease-out 0.6s both;
+        }
+
+        .release-date {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.3em;
+            color: #321a90;
+            margin-bottom: 2.5rem;
+        }
+
+        .description {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #321a90;
+            margin-bottom: 2rem;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: #ffffff;
+            background: #321a90;
+            padding: 1rem 3rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover {
+            background: #4a2bb8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(50, 26, 144, 0.3);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding-top: 6rem;
+            padding-bottom: 4rem;
+            text-align: center;
+            animation: fadeInUp 1.2s ease-out 0.9s both;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #321a90;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: #4a2bb8;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(50, 26, 144, 0.3);
+        }
+
+        .social-link svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .footer-text {
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Track buttons */
+        .track-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .track-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .track-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: transparent;
+            border: 2px solid #321a90;
+            color: #321a90;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .track-btn:hover {
+            background: #321a90;
+            color: #ffffff;
+        }
+
+        .track-btn.playing {
+            background: #321a90;
+            color: #ffffff;
+        }
+
+        .track-btn .play-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .track-btn .play-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .sources-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .track-credit {
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+
+        /* Audio Player Controls */
+        .audio-player {
+            display: none;
+            background: #321a90;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-top: 0.5rem;
+            width: 280px;
+            animation: fadeInUp 0.2s ease-out;
+        }
+
+        .audio-player.visible {
+            display: block;
+        }
+
+        .time-slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-slider {
+            width: 100%;
+            height: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .time-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .player-bottom-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .player-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .player-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .player-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .volume-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0.15rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .volume-slider {
+            width: 60px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-wrapper {
+            margin-bottom: 2.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .vinyl-image {
+                width: 100%;
+            }
+
+            .label-tag {
+                font-size: 0.7rem;
+                padding: 0.4rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-atmosphere"></div>
+    <div class="grain"></div>
+    
+    <div class="container">
+        <header>
+            <img src="src/bcc_logo.png" alt="Bobcat Commando Logo" class="logo_img">
+            <p class="subtitle">everything has it's tempo</p>
+        </header>
+
+        <div class="vinyl-showcase">
+            <img src="src/bcc_cover.jpg" alt="Vinyl Record Mockup" class="vinyl-image" id="coverImage">
+        </div>
+
+        <div class="release-info" id="releaseInfo">
+            <p class="release-date">Available December 2025</p>
+            <div class="cta-wrapper">
+                <a href="#" class="cta-button">Pre-Order Now</a>
+            </div>
+            <div class="track-list">
+                <div class="track-item">
+                    <button class="track-btn" data-track="audio/put.mpeg">
+                        <span class="play-icon">
+                            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </span>
+                        A1. Put Your Head On My Shoulder
+                    </button>
+                    <div class="audio-player">
+                        <div class="time-slider-container">
+                            <input type="range" class="time-slider" value="0" min="0" max="100">
+                            <div class="time-display">
+                                <span class="current-time">0:00</span>
+                                <span class="duration">0:00</span>
+                            </div>
+                        </div>
+                        <div class="player-bottom-controls">
+                            <button class="player-btn play-pause-btn">
+                                <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <div class="volume-container">
+                                <button class="volume-btn">
+                                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                </button>
+                                <input type="range" class="volume-slider" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="track-item">
+                    <button class="track-btn" data-track="audio/pea.mpeg">
+                        <span class="play-icon">
+                            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </span>
+                        A2. Pea ft. Dear Mama
+                    </button>
+                    <div class="audio-player">
+                        <div class="time-slider-container">
+                            <input type="range" class="time-slider" value="0" min="0" max="100">
+                            <div class="time-display">
+                                <span class="current-time">0:00</span>
+                                <span class="duration">0:00</span>
+                            </div>
+                        </div>
+                        <div class="player-bottom-controls">
+                            <button class="player-btn play-pause-btn">
+                                <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <div class="volume-container">
+                                <button class="volume-btn">
+                                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                </button>
+                                <input type="range" class="volume-slider" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="track-item">
+                    <button class="track-btn" data-track="audio/skyfall.mp3">
+                        <span class="play-icon">
+                            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </span>
+                        B1. Skyfall
+                    </button>
+                    <div class="audio-player">
+                        <div class="time-slider-container">
+                            <input type="range" class="time-slider" value="0" min="0" max="100">
+                            <div class="time-display">
+                                <span class="current-time">0:00</span>
+                                <span class="duration">0:00</span>
+                            </div>
+                        </div>
+                        <div class="player-bottom-controls">
+                            <button class="player-btn play-pause-btn">
+                                <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <div class="volume-container">
+                                <button class="volume-btn">
+                                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                </button>
+                                <input type="range" class="volume-slider" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="track-item">
+                    <button class="track-btn" data-track="audio/life.mpeg">
+                        <span class="play-icon">
+                            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </span>
+                        B2. That's Called Life
+                    </button>
+                    <div class="audio-player">
+                        <div class="time-slider-container">
+                            <input type="range" class="time-slider" value="0" min="0" max="100">
+                            <div class="time-display">
+                                <span class="current-time">0:00</span>
+                                <span class="duration">0:00</span>
+                            </div>
+                        </div>
+                        <div class="player-bottom-controls">
+                            <button class="player-btn play-pause-btn">
+                                <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                            <div class="volume-container">
+                                <button class="volume-btn">
+                                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                </button>
+                                <input type="range" class="volume-slider" value="100" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <footer>
+            <p class="sources-text">Sources: A1 - Paul Anka, A2 - 2Tupas and RHCP, B1 - Adele, B2 - Cowboys</p>
+            <p class="track-credit">Bobcat Commando<br>Producer: Boda<br>Lead Singer: Roger</p>
+            <div class="social-links">
+                <a href="#" class="social-link" title="Spotify">
+                    <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                </a>
+                <a href="https://soundcloud.com/bobcat-commando" class="social-link" title="SoundCloud">
+                    <svg viewBox="0 0 24 24"><path d="M1.175 12.225c-.051 0-.094.046-.101.1l-.233 2.154.233 2.105c.007.058.05.098.101.098.05 0 .09-.04.099-.098l.255-2.105-.27-2.154c-.009-.06-.052-.1-.084-.1zm-.899.828c-.06 0-.091.037-.104.094L0 14.479l.165 1.308c.014.057.045.094.09.094s.089-.037.099-.094l.21-1.308-.21-1.334c-.01-.057-.054-.09-.09-.09zm1.83-1.229c-.061 0-.12.045-.12.104l-.21 2.563.225 2.458c0 .06.045.104.106.104.061 0 .12-.044.12-.104l.24-2.474-.24-2.547c0-.06-.059-.104-.12-.104zm.945-.089c-.075 0-.135.06-.15.135l-.193 2.64.21 2.544c.016.077.075.138.149.138.075 0 .135-.061.15-.138l.24-2.544-.24-2.64c-.015-.075-.06-.135-.135-.135l-.031-.001zm.96-.428c-.09 0-.149.075-.165.164l-.18 3.067.195 2.519c.016.09.075.165.165.165s.164-.074.18-.165l.21-2.519-.21-3.067c-.015-.09-.09-.164-.18-.164l-.015-.001zm.976-.294c-.104 0-.194.089-.21.209l-.164 3.352.18 2.489c.015.104.09.194.21.194.104 0 .194-.09.21-.194l.195-2.489-.195-3.352c-.015-.12-.105-.21-.21-.21l-.016.001zm1.065-.449c-.12 0-.225.105-.225.225l-.149 3.791.164 2.459c0 .135.105.225.225.225.135 0 .24-.09.24-.225l.164-2.459-.164-3.791c0-.12-.105-.225-.24-.225zm.99-.104c-.135 0-.24.105-.255.24l-.15 3.885.165 2.43c.016.135.12.24.255.24.12 0 .24-.105.255-.24l.18-2.43-.18-3.885c-.015-.135-.12-.24-.255-.24zm1.066.135c-.15 0-.27.12-.27.27l-.135 3.735.15 2.414c0 .15.12.27.27.27.135 0 .255-.12.27-.27l.165-2.414-.165-3.735c-.015-.15-.135-.27-.27-.27zm1.05-.51c-.165 0-.285.135-.3.285l-.12 4.11.135 2.385c.015.165.135.3.3.3.149 0 .285-.135.285-.3l.15-2.385-.15-4.11c-.015-.15-.135-.285-.285-.285zm1.08.449c-.165 0-.3.149-.315.314l-.105 3.66.12 2.354c.015.18.149.315.315.315.149 0 .3-.135.314-.315l.12-2.354-.12-3.66c-.015-.165-.149-.314-.314-.314l-.015-.001zm1.095-.329c-.18 0-.33.165-.345.345l-.09 3.645.105 2.339c.015.18.165.33.345.33.165 0 .315-.15.345-.33l.105-2.339-.105-3.645c-.015-.18-.165-.345-.345-.345zm1.125.270c-.195 0-.345.165-.36.36l-.075 3.389.09 2.31c.015.195.165.36.36.36.181 0 .33-.165.346-.36l.104-2.31-.089-3.389c-.016-.195-.166-.36-.361-.36l-.015-.001zm1.11-.704c-.21 0-.375.18-.391.39l-.074 4.095.089 2.28c.016.21.181.375.391.375.195 0 .375-.165.375-.375l.105-2.28-.105-4.095c0-.21-.165-.39-.375-.39l-.015-.001zm2.296-2.024c-.24-.12-.48-.18-.735-.18-.195 0-.39.03-.57.09-.195.06-.39.149-.569.255-.361.209-.661.509-.9.869-.24.359-.39.779-.45 1.229-.03.18-.045.359-.045.539v6.104c0 .255.195.465.449.48h5.355c1.485 0 2.684-1.2 2.684-2.685s-1.2-2.684-2.684-2.684c-.45 0-.885.12-1.275.315-.195-.99-.765-1.845-1.56-2.414z"/></svg>
+                </a>
+                <a href="#" class="social-link" title="Instagram">
+                    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <a href="mailto:contact@example.com" class="social-link" title="Email">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                </a>
+            </div>
+            <p class="footer-text">© 2025 All Rights Reserved</p>
+        </footer>
+    </div>
+    <script>
+        const audio = new Audio();
+        let currentBtn = null;
+        let currentPlayer = null;
+        let savedVolume = 1;
+
+        // Format time helper
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Update icons helper
+        function updateIcons(element, isPlaying) {
+            if (!element) return;
+            const playIcon = element.querySelector('.icon-play');
+            const pauseIcon = element.querySelector('.icon-pause');
+            if (playIcon) playIcon.style.display = isPlaying ? 'none' : 'block';
+            if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+        }
+
+        // Track button clicks
+        document.querySelectorAll('.track-btn').forEach(btn => {
+            const trackItem = btn.closest('.track-item');
+            const player = trackItem.querySelector('.audio-player');
+            const playPauseBtn = player.querySelector('.play-pause-btn');
+            const timeSlider = player.querySelector('.time-slider');
+            const currentTimeEl = player.querySelector('.current-time');
+            const durationEl = player.querySelector('.duration');
+            const volumeSlider = player.querySelector('.volume-slider');
+            const volumeBtn = player.querySelector('.volume-btn');
+
+            btn.addEventListener('click', function() {
+                const trackSrc = this.dataset.track;
+                
+                // If clicking same button, stop and close player
+                if (currentBtn === this) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    updateIcons(this, false);
+                    updateIcons(playPauseBtn, false);
+                    this.classList.remove('playing');
+                    player.classList.remove('visible');
+                    // Reset time display
+                    const currentTimeEl = player.querySelector('.current-time');
+                    const timeSliderEl = player.querySelector('.time-slider');
+                    if (currentTimeEl) currentTimeEl.textContent = '0:00';
+                    if (timeSliderEl) timeSliderEl.value = 0;
+                    currentBtn = null;
+                    currentPlayer = null;
+                    return;
+                }
+                
+                // Hide previous player and reset button
+                if (currentBtn && currentBtn !== this) {
+                    const prevItem = currentBtn.closest('.track-item');
+                    const prevPlayer = prevItem.querySelector('.audio-player');
+                    prevPlayer.classList.remove('visible');
+                    updateIcons(currentBtn, false);
+                    currentBtn.classList.remove('playing');
+                }
+                
+                // Show this player and play
+                player.classList.add('visible');
+                audio.src = trackSrc;
+                audio.play();
+                updateIcons(this, true);
+                updateIcons(playPauseBtn, true);
+                this.classList.add('playing');
+                currentBtn = this;
+                currentPlayer = player;
+            });
+
+            // Player play/pause button
+            playPauseBtn.addEventListener('click', function() {
+                if (!currentBtn || currentBtn.closest('.track-item') !== trackItem) return;
+                if (audio.paused) {
+                    audio.play();
+                    updateIcons(currentBtn, true);
+                    updateIcons(this, true);
+                    currentBtn.classList.add('playing');
+                } else {
+                    audio.pause();
+                    updateIcons(currentBtn, false);
+                    updateIcons(this, false);
+                    currentBtn.classList.remove('playing');
+                }
+            });
+
+            // Time slider
+            timeSlider.addEventListener('input', function() {
+                if (currentPlayer !== player) return;
+                const time = (this.value / 100) * audio.duration;
+                audio.currentTime = time;
+            });
+
+            // Volume slider
+            volumeSlider.addEventListener('input', function() {
+                audio.volume = this.value / 100;
+                // Sync all volume sliders
+                document.querySelectorAll('.volume-slider').forEach(vs => vs.value = this.value);
+            });
+
+            // Volume button (mute toggle)
+            volumeBtn.addEventListener('click', function() {
+                if (audio.volume > 0) {
+                    savedVolume = audio.volume;
+                    audio.volume = 0;
+                    document.querySelectorAll('.volume-slider').forEach(vs => vs.value = 0);
+                } else {
+                    audio.volume = savedVolume;
+                    document.querySelectorAll('.volume-slider').forEach(vs => vs.value = savedVolume * 100);
+                }
+            });
+        });
+
+        // Update time display for active player
+        audio.addEventListener('timeupdate', function() {
+            if (!currentPlayer) return;
+            const progress = (audio.currentTime / audio.duration) * 100;
+            const timeSlider = currentPlayer.querySelector('.time-slider');
+            const currentTimeEl = currentPlayer.querySelector('.current-time');
+            if (timeSlider) timeSlider.value = progress || 0;
+            if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
+        });
+
+        // Set duration when loaded
+        audio.addEventListener('loadedmetadata', function() {
+            if (!currentPlayer) return;
+            const durationEl = currentPlayer.querySelector('.duration');
+            if (durationEl) durationEl.textContent = formatTime(audio.duration);
+        });
+
+        // Track ended
+        audio.addEventListener('ended', function() {
+            if (!currentBtn || !currentPlayer) return;
+            const playPauseBtn = currentPlayer.querySelector('.play-pause-btn');
+            const timeSlider = currentPlayer.querySelector('.time-slider');
+            const currentTimeEl = currentPlayer.querySelector('.current-time');
+            updateIcons(currentBtn, false);
+            updateIcons(playPauseBtn, false);
+            currentBtn.classList.remove('playing');
+            if (timeSlider) timeSlider.value = 0;
+            if (currentTimeEl) currentTimeEl.textContent = '0:00';
+        });
+
+        // Click on cover image to scroll down
+        document.getElementById('coverImage').addEventListener('click', function() {
+            document.getElementById('releaseInfo').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    </script>
+</body>
+</html>
+
