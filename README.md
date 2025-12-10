@@ -6,4 +6,4 @@
 
 Official website for Bobcat Commando - *"everything has it's tempo"*
 
-🎵 **Available December 2025**
+🎵 **Available December 2027**
