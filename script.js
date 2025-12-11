@@ -181,10 +181,12 @@ audio.addEventListener('ended', function() {
     if (currentTimeEl) currentTimeEl.textContent = '0:00';
 });
 
-// Click on cover image to scroll down
+// Click on cover image to scroll down (with offset for spacing)
 document.getElementById('coverImage').addEventListener('click', function() {
-    document.getElementById('releaseInfo').scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
+    const element = document.getElementById('releaseInfo');
+    const offsetTop = element.getBoundingClientRect().top + window.pageYOffset - 40;
+    window.scrollTo({
+        top: offsetTop,
+        behavior: 'smooth'
     });
 });
