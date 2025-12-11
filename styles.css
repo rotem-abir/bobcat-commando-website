@@ -73,7 +73,7 @@ h1 {
     font-size: 1rem;
     color: var(--text-muted);
     letter-spacing: 0.1em;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .logo_img {
@@ -341,6 +341,19 @@ footer {
     border-radius: 50%;
     cursor: pointer;
     border: none;
+}
+
+.time-slider:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.time-slider:disabled::-webkit-slider-thumb {
+    cursor: not-allowed;
+}
+
+.time-slider:disabled::-moz-range-thumb {
+    cursor: not-allowed;
 }
 
 .time-display {

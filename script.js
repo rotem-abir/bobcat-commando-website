@@ -5,10 +5,10 @@
 const PLAYER_HTML = `
 <div class="audio-player">
     <div class="time-slider-container">
-        <input type="range" class="time-slider" value="0" min="0" max="100">
+        <input type="range" class="time-slider" value="0" min="0" max="100" disabled>
         <div class="time-display">
             <span class="current-time">0:00</span>
-            <span class="duration">0:00</span>
+            <span class="duration">Loading...</span>
         </div>
     </div>
     <div class="player-bottom-controls">
@@ -30,21 +30,27 @@ const PLAYER_HTML = `
 // AUDIO PLAYER LOGIC
 // =============================================
 const audio = new Audio();
-audio.preload = 'metadata'; // Ensure metadata loads for seeking
+audio.preload = 'auto'; // Preload more aggressively
 let currentBtn = null;
 let currentPlayer = null;
 let currentContainer = null;
 let savedVolume = 1;
-let isSeeking = false; // Flag to prevent timeupdate from interfering with seeking
+let isSeeking = false;
 
 // Get all track buttons as array for autoplay
 const trackButtons = Array.from(document.querySelectorAll('.track-btn'));
 
 // Format time helper
 function formatTime(seconds) {
+    if (!seconds || isNaN(seconds) || !isFinite(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Check if audio is ready for seeking
+function canSeek() {
+    return audio.readyState >= 1 && audio.duration && !isNaN(audio.duration) && isFinite(audio.duration);
 }
 
 // Update icons helper
@@ -54,6 +60,17 @@ function updateIcons(element, isPlaying) {
     const pauseIcon = element.querySelector('.icon-pause');
     if (playIcon) playIcon.style.display = isPlaying ? 'none' : 'block';
     if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+}
+
+// Enable slider when metadata is ready
+function enableSlider() {
+    if (!currentPlayer) return;
+    const timeSlider = currentPlayer.querySelector('.time-slider');
+    const durationEl = currentPlayer.querySelector('.duration');
+    if (timeSlider && canSeek()) {
+        timeSlider.disabled = false;
+        if (durationEl) durationEl.textContent = formatTime(audio.duration);
+    }
 }
 
 // Inject player into container and setup controls
@@ -92,8 +109,7 @@ function injectPlayer(container) {
         isSeeking = false;
     }
     function doSeek() {
-        // Only seek if duration is valid
-        if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+        if (canSeek()) {
             const time = (timeSlider.value / 100) * audio.duration;
             audio.currentTime = time;
         }
@@ -142,7 +158,7 @@ document.querySelectorAll('.track-btn').forEach(btn => {
             audio.currentTime = 0;
             updateIcons(this, false);
             this.classList.remove('playing');
-            container.innerHTML = ''; // Remove player
+            container.innerHTML = '';
             currentBtn = null;
             currentPlayer = null;
             currentContainer = null;
@@ -154,7 +170,7 @@ document.querySelectorAll('.track-btn').forEach(btn => {
             updateIcons(currentBtn, false);
             currentBtn.classList.remove('playing');
             if (currentContainer) {
-                currentContainer.innerHTML = ''; // Remove previous player
+                currentContainer.innerHTML = '';
             }
         }
         
@@ -162,50 +178,48 @@ document.querySelectorAll('.track-btn').forEach(btn => {
         const player = injectPlayer(container);
         player.classList.add('visible');
         
-        // Play audio
-        audio.src = trackSrc;
-        audio.play();
-        updateIcons(this, true);
-        updateIcons(player.querySelector('.play-pause-btn'), true);
-        this.classList.add('playing');
-        
         currentBtn = this;
         currentPlayer = player;
         currentContainer = container;
+        
+        // Load and play audio
+        audio.src = trackSrc;
+        audio.load(); // Force load
+        audio.play().catch(e => console.log('Play error:', e));
+        updateIcons(this, true);
+        updateIcons(player.querySelector('.play-pause-btn'), true);
+        this.classList.add('playing');
     });
 });
 
 // Update time display for active player
 audio.addEventListener('timeupdate', function() {
-    if (!currentPlayer || isSeeking) return; // Don't update while user is seeking
-    const progress = (audio.currentTime / audio.duration) * 100;
+    if (!currentPlayer || isSeeking) return;
     const timeSlider = currentPlayer.querySelector('.time-slider');
     const currentTimeEl = currentPlayer.querySelector('.current-time');
-    if (timeSlider && !isSeeking) timeSlider.value = progress || 0;
+    
+    if (canSeek()) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        if (timeSlider && !isSeeking) timeSlider.value = progress || 0;
+    }
     if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
 });
 
-// Set duration when loaded
-audio.addEventListener('loadedmetadata', function() {
-    if (!currentPlayer) return;
-    const durationEl = currentPlayer.querySelector('.duration');
-    if (durationEl) durationEl.textContent = formatTime(audio.duration);
-});
+// Enable slider when metadata loads
+audio.addEventListener('loadedmetadata', enableSlider);
+audio.addEventListener('durationchange', enableSlider);
+audio.addEventListener('canplay', enableSlider);
 
 // Track ended - autoplay next song
 audio.addEventListener('ended', function() {
     if (!currentBtn) return;
     
-    // Find current track index
     const currentIndex = trackButtons.indexOf(currentBtn);
     
-    // Check if there's a next track
     if (currentIndex < trackButtons.length - 1) {
-        // Play next track
         const nextBtn = trackButtons[currentIndex + 1];
         nextBtn.click();
     } else {
-        // Last track ended - just reset
         if (currentPlayer) {
             const playPauseBtn = currentPlayer.querySelector('.play-pause-btn');
             const timeSlider = currentPlayer.querySelector('.time-slider');
@@ -219,7 +233,7 @@ audio.addEventListener('ended', function() {
     }
 });
 
-// Click on cover image to scroll down (with offset for spacing)
+// Click on cover image to scroll down
 document.getElementById('coverImage').addEventListener('click', function() {
     const element = document.getElementById('releaseInfo');
     const offsetTop = element.getBoundingClientRect().top + window.pageYOffset - 40;
