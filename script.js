@@ -30,6 +30,7 @@ const PLAYER_HTML = `
 // AUDIO PLAYER LOGIC
 // =============================================
 const audio = new Audio();
+audio.preload = 'metadata'; // Ensure metadata loads for seeking
 let currentBtn = null;
 let currentPlayer = null;
 let currentContainer = null;
@@ -84,26 +85,28 @@ function injectPlayer(container) {
     });
 
     // Time slider - handle seeking
-    timeSlider.addEventListener('mousedown', function() {
+    function startSeeking() {
         isSeeking = true;
-    });
-    timeSlider.addEventListener('touchstart', function() {
-        isSeeking = true;
-    });
-    timeSlider.addEventListener('input', function() {
-        const time = (this.value / 100) * audio.duration;
-        if (!isNaN(time)) {
+    }
+    function stopSeeking() {
+        isSeeking = false;
+    }
+    function doSeek() {
+        // Only seek if duration is valid
+        if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+            const time = (timeSlider.value / 100) * audio.duration;
             audio.currentTime = time;
         }
-    });
-    timeSlider.addEventListener('mouseup', function() {
-        isSeeking = false;
-    });
-    timeSlider.addEventListener('touchend', function() {
-        isSeeking = false;
-    });
+    }
+    
+    timeSlider.addEventListener('mousedown', startSeeking);
+    timeSlider.addEventListener('touchstart', startSeeking, { passive: true });
+    timeSlider.addEventListener('input', doSeek);
+    timeSlider.addEventListener('mouseup', stopSeeking);
+    timeSlider.addEventListener('touchend', stopSeeking);
     timeSlider.addEventListener('change', function() {
-        isSeeking = false;
+        doSeek();
+        stopSeeking();
     });
 
     // Volume slider
