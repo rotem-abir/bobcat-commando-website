@@ -171,8 +171,8 @@ h1 {
 /* Footer */
 footer {
     margin-top: auto;
-    padding-top: 6rem;
-    padding-bottom: 4rem;
+    padding-top: 3.5rem;
+    padding-bottom: 2.5rem;
     text-align: center;
     animation: fadeInUp 1.2s ease-out 0.9s both;
 }
@@ -272,18 +272,18 @@ footer {
     fill: currentColor;
 }
 
-.sources-text {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
-    margin-bottom: 1.5rem;
-}
-
 .track-credit {
     font-style: italic;
     font-size: 1rem;
     color: var(--text-muted);
     letter-spacing: 0.1em;
+    margin-bottom: 2rem;
+}
+
+.sources-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
     margin-bottom: 2rem;
 }
 
