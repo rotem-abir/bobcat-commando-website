@@ -34,6 +34,7 @@ let currentBtn = null;
 let currentPlayer = null;
 let currentContainer = null;
 let savedVolume = 1;
+let isSeeking = false; // Flag to prevent timeupdate from interfering with seeking
 
 // Get all track buttons as array for autoplay
 const trackButtons = Array.from(document.querySelectorAll('.track-btn'));
@@ -82,10 +83,27 @@ function injectPlayer(container) {
         }
     });
 
-    // Time slider
+    // Time slider - handle seeking
+    timeSlider.addEventListener('mousedown', function() {
+        isSeeking = true;
+    });
+    timeSlider.addEventListener('touchstart', function() {
+        isSeeking = true;
+    });
     timeSlider.addEventListener('input', function() {
         const time = (this.value / 100) * audio.duration;
-        audio.currentTime = time;
+        if (!isNaN(time)) {
+            audio.currentTime = time;
+        }
+    });
+    timeSlider.addEventListener('mouseup', function() {
+        isSeeking = false;
+    });
+    timeSlider.addEventListener('touchend', function() {
+        isSeeking = false;
+    });
+    timeSlider.addEventListener('change', function() {
+        isSeeking = false;
     });
 
     // Volume slider
@@ -156,11 +174,11 @@ document.querySelectorAll('.track-btn').forEach(btn => {
 
 // Update time display for active player
 audio.addEventListener('timeupdate', function() {
-    if (!currentPlayer) return;
+    if (!currentPlayer || isSeeking) return; // Don't update while user is seeking
     const progress = (audio.currentTime / audio.duration) * 100;
     const timeSlider = currentPlayer.querySelector('.time-slider');
     const currentTimeEl = currentPlayer.querySelector('.current-time');
-    if (timeSlider) timeSlider.value = progress || 0;
+    if (timeSlider && !isSeeking) timeSlider.value = progress || 0;
     if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
 });
 
