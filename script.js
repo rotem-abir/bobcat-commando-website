@@ -4,23 +4,29 @@
 // =============================================
 const PLAYER_HTML = `
 <div class="audio-player">
-    <div class="time-slider-container">
-        <input type="range" class="time-slider" value="0" min="0" max="100" disabled>
-        <div class="time-display">
-            <span class="current-time">0:00</span>
-            <span class="duration">Loading...</span>
-        </div>
+    <div class="loading-bar">
+        <div class="loading-progress"></div>
+        <span class="loading-text">Loading audio...</span>
     </div>
-    <div class="player-bottom-controls">
-        <button class="player-btn play-pause-btn">
-            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-        </button>
-        <div class="volume-container">
-            <button class="volume-btn">
-                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+    <div class="player-content" style="display:none;">
+        <div class="time-slider-container">
+            <input type="range" class="time-slider" value="0" min="0" max="100">
+            <div class="time-display">
+                <span class="current-time">0:00</span>
+                <span class="duration">0:00</span>
+            </div>
+        </div>
+        <div class="player-bottom-controls">
+            <button class="player-btn play-pause-btn">
+                <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             </button>
-            <input type="range" class="volume-slider" value="100" min="0" max="100">
+            <div class="volume-container">
+                <button class="volume-btn">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </button>
+                <input type="range" class="volume-slider" value="100" min="0" max="100">
+            </div>
         </div>
     </div>
 </div>
@@ -62,14 +68,28 @@ function updateIcons(element, isPlaying) {
     if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
 }
 
-// Enable slider when metadata is ready
-function enableSlider() {
+// Show player controls when audio is ready
+function showPlayerReady() {
     if (!currentPlayer) return;
-    const timeSlider = currentPlayer.querySelector('.time-slider');
+    const loadingBar = currentPlayer.querySelector('.loading-bar');
+    const playerContent = currentPlayer.querySelector('.player-content');
     const durationEl = currentPlayer.querySelector('.duration');
-    if (timeSlider && canSeek()) {
-        timeSlider.disabled = false;
+    
+    if (canSeek()) {
+        if (loadingBar) loadingBar.style.display = 'none';
+        if (playerContent) playerContent.style.display = 'block';
         if (durationEl) durationEl.textContent = formatTime(audio.duration);
+    }
+}
+
+// Update loading progress bar
+function updateLoadingProgress() {
+    if (!currentPlayer || !audio.buffered.length) return;
+    const loadingProgress = currentPlayer.querySelector('.loading-progress');
+    if (loadingProgress && audio.duration) {
+        const bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
+        const percent = (bufferedEnd / audio.duration) * 100;
+        loadingProgress.style.width = percent + '%';
     }
 }
 
@@ -205,10 +225,12 @@ audio.addEventListener('timeupdate', function() {
     if (currentTimeEl) currentTimeEl.textContent = formatTime(audio.currentTime);
 });
 
-// Enable slider when metadata loads
-audio.addEventListener('loadedmetadata', enableSlider);
-audio.addEventListener('durationchange', enableSlider);
-audio.addEventListener('canplay', enableSlider);
+// Show player when audio is ready
+audio.addEventListener('loadedmetadata', showPlayerReady);
+audio.addEventListener('durationchange', showPlayerReady);
+audio.addEventListener('canplay', showPlayerReady);
+audio.addEventListener('canplaythrough', showPlayerReady);
+audio.addEventListener('progress', updateLoadingProgress);
 
 // Track ended - autoplay next song
 audio.addEventListener('ended', function() {

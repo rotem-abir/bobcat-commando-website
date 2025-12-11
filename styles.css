@@ -308,6 +308,54 @@ footer {
     display: block;
 }
 
+/* Loading bar */
+.loading-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.loading-progress {
+    width: 0%;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    align-self: flex-start;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
+    animation: loadingShimmer 1.5s infinite;
+}
+
+@keyframes loadingShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+}
+
+.loading-text {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.05em;
+}
+
+.player-content {
+    display: none;
+}
+
 .time-slider-container {
     display: flex;
     flex-direction: column;
