@@ -217,6 +217,12 @@ footer {
     text-transform: uppercase;
 }
 
+.version-text {
+    font-size: 0.5rem;
+    color: #ccc;
+    margin-top: 0.5rem;
+}
+
 /* Track buttons */
 .track-list {
     display: flex;
