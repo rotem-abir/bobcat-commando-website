@@ -35,6 +35,9 @@ let currentPlayer = null;
 let currentContainer = null;
 let savedVolume = 1;
 
+// Get all track buttons as array for autoplay
+const trackButtons = Array.from(document.querySelectorAll('.track-btn'));
+
 // Format time helper
 function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
@@ -168,17 +171,31 @@ audio.addEventListener('loadedmetadata', function() {
     if (durationEl) durationEl.textContent = formatTime(audio.duration);
 });
 
-// Track ended
+// Track ended - autoplay next song
 audio.addEventListener('ended', function() {
-    if (!currentBtn || !currentPlayer) return;
-    const playPauseBtn = currentPlayer.querySelector('.play-pause-btn');
-    const timeSlider = currentPlayer.querySelector('.time-slider');
-    const currentTimeEl = currentPlayer.querySelector('.current-time');
-    updateIcons(currentBtn, false);
-    updateIcons(playPauseBtn, false);
-    currentBtn.classList.remove('playing');
-    if (timeSlider) timeSlider.value = 0;
-    if (currentTimeEl) currentTimeEl.textContent = '0:00';
+    if (!currentBtn) return;
+    
+    // Find current track index
+    const currentIndex = trackButtons.indexOf(currentBtn);
+    
+    // Check if there's a next track
+    if (currentIndex < trackButtons.length - 1) {
+        // Play next track
+        const nextBtn = trackButtons[currentIndex + 1];
+        nextBtn.click();
+    } else {
+        // Last track ended - just reset
+        if (currentPlayer) {
+            const playPauseBtn = currentPlayer.querySelector('.play-pause-btn');
+            const timeSlider = currentPlayer.querySelector('.time-slider');
+            const currentTimeEl = currentPlayer.querySelector('.current-time');
+            updateIcons(currentBtn, false);
+            updateIcons(playPauseBtn, false);
+            currentBtn.classList.remove('playing');
+            if (timeSlider) timeSlider.value = 0;
+            if (currentTimeEl) currentTimeEl.textContent = '0:00';
+        }
+    }
 });
 
 // Click on cover image to scroll down (with offset for spacing)
