@@ -107,22 +107,43 @@ function injectPlayer(container) {
         isSeeking = false;
     }
     function doSeek() {
+        const sliderValue = parseFloat(timeSlider.value) || 0;
         const duration = audio.duration;
-        // Try to seek even if duration seems invalid - let the browser handle it
-        if (duration && duration > 0) {
-            const targetTime = (timeSlider.value / 100) * duration;
+        
+        // Always try to seek - don't wait for duration
+        if (duration && duration > 0 && !isNaN(duration) && isFinite(duration)) {
+            // We have valid duration - seek normally
+            const targetTime = (sliderValue / 100) * duration;
             try {
-                // Try fastSeek first (better for streaming)
                 if (audio.fastSeek) {
                     audio.fastSeek(targetTime);
                 } else {
                     audio.currentTime = targetTime;
                 }
             } catch (e) {
-                // Fallback - just set currentTime
                 audio.currentTime = targetTime;
             }
+        } else if (audio.seekable && audio.seekable.length > 0) {
+            // Use seekable ranges if available (more accurate than buffered)
+            const seekableEnd = audio.seekable.end(audio.seekable.length - 1);
+            if (seekableEnd > 0) {
+                const targetTime = (sliderValue / 100) * seekableEnd;
+                try {
+                    audio.currentTime = targetTime;
+                } catch (e) {}
+            }
+        } else if (audio.buffered && audio.buffered.length > 0) {
+            // Fallback to buffered data
+            const bufferedEnd = audio.buffered.end(audio.buffered.length - 1);
+            if (bufferedEnd > 0) {
+                const targetTime = (sliderValue / 100) * bufferedEnd;
+                try {
+                    audio.currentTime = targetTime;
+                } catch (e) {}
+            }
         }
+        // If none of the above work, the seek will fail silently
+        // But at least we tried - this prevents the "doesn't work on first click" issue
     }
     
     timeSlider.addEventListener('mousedown', startSeeking);
@@ -198,13 +219,16 @@ document.querySelectorAll('.track-btn').forEach(btn => {
         currentPlayer = player;
         currentContainer = container;
         
-        // Load and play audio
-        audio.src = trackSrc;
-        audio.load(); // Force load
-        audio.play().catch(e => console.log('Play error:', e));
-        updateIcons(this, true);
-        updateIcons(player.querySelector('.play-pause-btn'), true);
-        this.classList.add('playing');
+        // Small delay to ensure DOM is ready and event listeners are attached
+        setTimeout(() => {
+            // Load and play audio
+            audio.src = trackSrc;
+            audio.load(); // Force load
+            audio.play().catch(e => console.log('Play error:', e));
+            updateIcons(this, true);
+            updateIcons(player.querySelector('.play-pause-btn'), true);
+            this.classList.add('playing');
+        }, 10);
     });
 });
 
