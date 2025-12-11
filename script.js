@@ -54,9 +54,9 @@ function formatTime(seconds) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Check if audio is ready for seeking
+// Check if audio is ready for seeking (less strict now)
 function canSeek() {
-    return audio.readyState >= 1 && audio.duration && !isNaN(audio.duration) && isFinite(audio.duration);
+    return audio.duration && audio.duration > 0 && isFinite(audio.duration);
 }
 
 // Update icons helper
@@ -129,17 +129,35 @@ function injectPlayer(container) {
         isSeeking = false;
     }
     function doSeek() {
-        if (canSeek()) {
-            const time = (timeSlider.value / 100) * audio.duration;
-            audio.currentTime = time;
+        const duration = audio.duration;
+        // Try to seek even if duration seems invalid - let the browser handle it
+        if (duration && duration > 0) {
+            const targetTime = (timeSlider.value / 100) * duration;
+            try {
+                // Try fastSeek first (better for streaming)
+                if (audio.fastSeek) {
+                    audio.fastSeek(targetTime);
+                } else {
+                    audio.currentTime = targetTime;
+                }
+            } catch (e) {
+                // Fallback - just set currentTime
+                audio.currentTime = targetTime;
+            }
         }
     }
     
     timeSlider.addEventListener('mousedown', startSeeking);
     timeSlider.addEventListener('touchstart', startSeeking, { passive: true });
     timeSlider.addEventListener('input', doSeek);
-    timeSlider.addEventListener('mouseup', stopSeeking);
-    timeSlider.addEventListener('touchend', stopSeeking);
+    timeSlider.addEventListener('mouseup', function() {
+        doSeek(); // Seek on release too
+        stopSeeking();
+    });
+    timeSlider.addEventListener('touchend', function() {
+        doSeek(); // Seek on release too
+        stopSeeking();
+    });
     timeSlider.addEventListener('change', function() {
         doSeek();
         stopSeeking();
@@ -209,6 +227,23 @@ document.querySelectorAll('.track-btn').forEach(btn => {
         updateIcons(this, true);
         updateIcons(player.querySelector('.play-pause-btn'), true);
         this.classList.add('playing');
+        
+        // Fallback: show player after 3 seconds even if metadata not loaded
+        setTimeout(() => {
+            if (currentPlayer) {
+                const loadingBar = currentPlayer.querySelector('.loading-bar');
+                const playerContent = currentPlayer.querySelector('.player-content');
+                if (loadingBar && loadingBar.style.display !== 'none') {
+                    loadingBar.style.display = 'none';
+                    playerContent.style.display = 'block';
+                    // Show unknown duration
+                    const durationEl = currentPlayer.querySelector('.duration');
+                    if (durationEl && durationEl.textContent === '0:00') {
+                        durationEl.textContent = '--:--';
+                    }
+                }
+            }
+        }, 3000);
     });
 });
 
